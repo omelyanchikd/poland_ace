@@ -12,7 +12,7 @@ import csv
 class Scenario():
     def __init__(self, history, firm_info, match_info, distribute_subsidies_info, firm_config, regression_type = "total",
                  distribute_subsidies = False, disturb_result = False, disturb_coefficients = False, regression = "bayes",
-                 seed = 1, output_file = "output.csv",):
+                 seed = 1, output = "output.csv",):
         random.seed(seed)
         self.seed = seed
         self.history = pandas.read_csv(history, sep = ";", decimal = ",")
@@ -36,7 +36,7 @@ class Scenario():
         self.benchmark = self.history['revenues']
         self.workers_history = self.history['employees']
         self.budget_history = self.history['budget']
-        self.output_file = open("output.csv", "a", newline = '')
+        self.output_file = open(output, "a", newline = '')
         self.output_writer = csv.writer(self.output_file, delimiter = ';')
 
 

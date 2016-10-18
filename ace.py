@@ -1,5 +1,6 @@
 from scenario import Scenario
 
+import sys
 import csv
 import copy
 
@@ -10,45 +11,44 @@ from distribute_funds import distribute_funding
 import pandas
 import random
 
-from sklearn import linear_model
+def main(argv):
 
-import matplotlib.pyplot as plt
+    args = argv
+    firm_config = str(args[0])
+    start_seed = int(args[1])
+    end_seed = int(args[2])
+    output = str(args[3])
 
-#datafile = "C:\Diana\Poland\Poland\poland_aggregate.csv"
-#datafile = "C:/Users/d.omelianchyk/Downloads/poland.csv"
-datafile = "poland.csv"
-history = pandas.read_csv(datafile, sep = ";", decimal = ",")
+    print(firm_config)
+    print(start_seed)
+    print(end_seed)
+    print(output)
 
-#datafile = "poland_info_copy.csv"
-#datafile = "D:\Poland\poland_info_copy.csv"
-#datafile = "C:/Users/d.omelianchyk/Downloads/poland_info.csv"
 
-steps = 34
 
-#firm_configurations = ["firm_info_1000_10_10.csv", "firm_info_5000_5000_5000.csv", "firm_info_10000_1000_100.csv",
-#                       "firm_info_10_10_10.csv", "firm_info_100_100_100.csv", "firm_info_10000_1000_100_10.csv",
-#                       "firm_info_200000.csv"]
+    datafile = "poland.csv"
+    history = pandas.read_csv(datafile, sep = ";", decimal = ",")
 
-firm_configurations = ["firm_info_5000_5000_5000.csv"]
+    steps = 34
 
-# "firm_info_1.csv",
+    #firm_configurations = ["firm_info_1.csv", "firm_info_10000_1000_100_10.csv", "firm_info_200000.csv"]
 
-regressions = ['bayes', 'linear']
-regression_types = ["average", "total"]
+    regressions = ['bayes', 'linear']
+    regression_types = ["average", "total"]
 
-distribute_subsidies = [True, False]
-disturb_results = [True, False]
-disturb_coefficients = [True, False]
+    distribute_subsidies = [True, False]
+    disturb_results = [True, False]
+    disturb_coefficients = [True, False]
 
-with open("output.csv", "w", newline='') as output_file:
-    writer = csv.DictWriter(output_file, delimiter=';',
-                            fieldnames=["seed", "firm_configuration", "regression_type", "regression", "distribute_subsidies",
+    with open(output, "w", newline='') as output_file:
+        writer = csv.DictWriter(output_file, delimiter=';',
+                                fieldnames=["seed", "firm_configuration", "regression_type", "regression", "distribute_subsidies",
                                         "disturb_result", "disturb_coefficients", "step", "mape", "r2_score"])
-    writer.writeheader()
-output_file.close()
+        writer.writeheader()
+        output_file.close()
 
-for firm_config in firm_configurations:
-    for seed in range(1000):
+#    for firm_config in firm_configurations:
+    for seed in range(start_seed, end_seed):
         random.seed(seed)
         firm_info = create_firms(pandas.read_csv(firm_config, sep = ";", decimal = ","), history['employees'][0])
         match_info = [[] for i in range(steps)]
@@ -68,21 +68,9 @@ for firm_config in firm_configurations:
                     for disturb_result in disturb_results:
                         for disturb_coefficient in disturb_coefficients:
                             Scenario("poland.csv", firm_info, match_info, distribute_subsidies_info, firm_config, regression_type,
-                                     distribute_subsidy, disturb_result, disturb_coefficient, regression, seed).run(steps)
-
-#scenario = Scenario("poland.csv", "firm_info_1000_10_10.csv", seed = 1)
-
-#scenario.run(steps)
+                                             distribute_subsidy, disturb_result, disturb_coefficient, regression, seed, output).run(steps)
 
 
 
-
-#plt.figure(figsize=(6, 5))
-#plt.title("Sales")
-#plt.plot(poland.sales, 'b-', label="Sales")
-#plt.ylim(ymin = 0)
-
-#plt.figure(figsize=(6, 5))
-#plt.title("Workers")
-#plt.plot(poland.workers, 'b-', label="Workers")
-#plt.show()
+if __name__ == "__main__":
+   main(sys.argv[1:])
